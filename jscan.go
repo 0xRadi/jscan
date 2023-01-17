@@ -1,16 +1,21 @@
 package main
 
 import (
-	"bufio"         // package for reading input from the command line
+	"bufio" // package for reading input from the command line
+	"crypto/tls"
 	"encoding/json" // package for encoding and decoding JSON
 	"flag"          // package for parsing command line flags
 	"fmt"           // package for formatting and printing output
 	"io"
 	"io/ioutil" // package for reading and writing files
-	"net/http"  // package for making HTTP requests
-	"os"        // package for interacting with the operating system
-	"regexp"    // package for working with regular expressions
-	"sync"      // package for synchronizing goroutines
+	"net"
+	"net/http" // package for making HTTP requests
+	"net/url"
+	"os"     // package for interacting with the operating system
+	"regexp" // package for working with regular expressions
+	"strings"
+	"sync" // package for synchronizing goroutines
+	"time"
 )
 
 // Matcher struct defines a struct for storing a regular expression and a string to print when a match is found
@@ -27,20 +32,33 @@ type Output struct {
 
 // flags that can be passed in through the command line
 var jsonOutput = flag.Bool("json", false, "JSON output format")
+var verbose = flag.Bool("v", false, "Verbose mode")
+var quite = flag.Bool("q", false, "start in silent mode with no stdout")
 var threadCount = flag.Int("t", 20, "Number of threads")
 var outputFile = flag.String("o", "ja_analysis.txt", "File to save output")
 
 // checkMatches function takes in a URL, a string of the body of the URL, and a slice of Matcher structs
 // it uses the regular expressions in the Matcher structs to find matches in the body of the URL
 // it stores the matches in a slice and prints the matches in either JSON or plain text format
-func checkMatches(url string, body string, matchers []Matcher) {
+func checkMatches(link string, body string, matchers []Matcher) {
 	matchedStrings := make(map[string]bool) // store matched strings to prevent duplicates
 	matches := []string{}                   // slice to store matches
+
+	// to exclude some rubbish findings
+	exclusionList := []string{"text", "w3", "video", "image", "application", "d/y", "m/y"}
+
 	for _, matcher := range matchers {
 		match := matcher.Regex.FindAllStringSubmatch(body, -1)
 		for _, submatches := range match {
 			for i, submatch := range submatches {
-				if !matchedStrings[submatch] {
+				matchExcluded := false
+				for _, excludedWord := range exclusionList {
+					if strings.Contains(submatch, excludedWord) {
+						matchExcluded = true
+						break
+					}
+				}
+				if !matchedStrings[submatch] && !matchExcluded {
 					matchedStrings[submatch] = true
 					if i == 0 {
 						matches = append(matches, matcher.PrintString+submatch)
@@ -56,11 +74,12 @@ func checkMatches(url string, body string, matchers []Matcher) {
 	// it prints JSON if -json is found
 	if len(matches) > 0 {
 		if *jsonOutput {
-			output := Output{URL: url, Matches: matches}
+			output := Output{URL: link, Matches: matches}
 			jsonData, _ := json.Marshal(output)
 			outputStr := string(jsonData)
-			fmt.Println(string(jsonData))
-
+			if !*quite {
+				fmt.Println(string(jsonData))
+			}
 			// check -o argv
 			if *outputFile != "" {
 				f, _ := os.OpenFile(*outputFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -68,15 +87,18 @@ func checkMatches(url string, body string, matchers []Matcher) {
 				io.WriteString(f, outputStr)
 			}
 		} else {
-			// Prints ASCII output
-			fmt.Println("\n[URL] " + url)
+			if !*quite {
+				// Prints ASCII output
+				fmt.Println("\n[URL] " + link)
+			}
 
 			// to save to output file
-			outputStr := "\n[URL] " + url + "\n"
+			outputStr := "\n[URL] " + link + "\n"
 
 			for _, match := range matches {
-				fmt.Println(match)
-
+				if !*quite {
+					fmt.Println(match)
+				}
 				// to save to output file
 				outputStr += match + "\n"
 			}
@@ -94,11 +116,41 @@ func checkMatches(url string, body string, matchers []Matcher) {
 // it makes an HTTP GET request to the given URL
 // it reads the body of the response and passes the URL and body to the checkMatches function
 // it decrements the WaitGroup when it finishes
-func worker(url string, matchers []Matcher, wg *sync.WaitGroup) {
+func worker(link string, matchers []Matcher, wg *sync.WaitGroup, semaphore chan struct{}) {
+	defer func() {
+		<-semaphore
+	}()
 	defer wg.Done()
-	resp, err := http.Get(url)
+	if *verbose {
+		println("[DEBUG] " + link)
+	}
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		DialContext: (&net.Dialer{
+			Timeout:   time.Second * 10,
+			KeepAlive: time.Second,
+		}).DialContext,
+	}
+	client := &http.Client{Transport: transport}
+
+	userAgent := "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:174.0) Gecko/20100101 Firefox/174.0"
+
+	req, _ := http.NewRequest("GET", link, nil)
+	req.Header.Set("User-Agent", userAgent)
+
+	if _, err := url.Parse(link); err != nil {
+		if *verbose {
+			fmt.Println(err)
+		}
+		return
+	}
+
+	resp, err := client.Do(req)
+
 	if err != nil {
-		fmt.Println(err)
+		if *verbose {
+			fmt.Println(err)
+		}
 		return
 	}
 	defer resp.Body.Close()
@@ -108,7 +160,10 @@ func worker(url string, matchers []Matcher, wg *sync.WaitGroup) {
 		fmt.Println(err)
 		return
 	}
-	checkMatches(url, string(body), matchers)
+	if resp.StatusCode != 200 {
+		return
+	}
+	checkMatches(link, string(body), matchers)
 }
 
 func main() {
@@ -222,14 +277,15 @@ func main() {
 		},
 	}
 
-	var wg sync.WaitGroup                          // create a WaitGroup to wait for all goroutines to finish
+	var wg sync.WaitGroup // create a WaitGroup to wait for all goroutines to finish
+
 	semaphore := make(chan struct{}, *threadCount) // create a semaphore to limit the number of concurrent goroutines
 
 	for scanner.Scan() {
-		url := scanner.Text()
-		semaphore <- struct{}{}       // acquire a spot in the semaphore
-		wg.Add(1)                     // increment the WaitGroup
-		go worker(url, matchers, &wg) // start the worker goroutine
+		link := scanner.Text()
+		semaphore <- struct{}{}                   // acquire a spot in the semaphore
+		wg.Add(1)                                 // increment the WaitGroup
+		go worker(link, matchers, &wg, semaphore) // start the worker goroutine
 	}
 	wg.Wait() // wait for all goroutines to finish
 }
