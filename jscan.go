@@ -175,10 +175,10 @@ func main() {
 
 	// Matchers for Secrets or endpoints
 	matchers := []Matcher{
-		{
-			Regex:       regexp.MustCompile("(?i)AIza[0-9A-Za-z-_]{35}|(?i)6L[0-9A-Za-z-_]{38}|(?i)^6[0-9a-zA-Z_-]{39}$"),
-			PrintString: "[Found] [google_api] ",
-		},
+		//{
+		//	Regex:       regexp.MustCompile("(?i)AIza[0-9A-Za-z-_]{35}|(?i)6L[0-9A-Za-z-_]{38}|(?i)^6[0-9a-zA-Z_-]{39}$"),
+		//	PrintString: "[Found] [google_api] ",
+		//},
 		{
 			Regex:       regexp.MustCompile("(?i)A[SK]IA[0-9A-Z]{16}"),
 			PrintString: "[Potential] [amazon_aws_access_key_id] ",
@@ -256,10 +256,6 @@ func main() {
 			PrintString: "[Found] [pgp_private_block] ",
 		},
 		{
-			Regex:       regexp.MustCompile("eyJ((?:\\.?(?:[A-Za-z0-9-_]+)){3})"),
-			PrintString: "[Found] [json_web_token] ",
-		},
-		{
 			Regex:       regexp.MustCompile("(xox[pboa]-[0-9]{12}-[0-9]{12}-[0-9]{12}-[a-z0-9]{32})"),
 			PrintString: "[Found] [slack_token] ",
 		},
@@ -281,11 +277,11 @@ func main() {
 		},
 		//https://github.com/deepfence/SecretScanner/blob/bbc861dca497b01870d31a35d77ec51fc82f21a2/config.yaml
 		{
-			Regex: regexp.MustCompile("(?i)appid=(\"|'|`)?[0-9a-f]{32}(\"|'|`)?"),
+			Regex:       regexp.MustCompile("(?i)appid=(\"|'|`)?[0-9a-f]{32}(\"|'|`)?"),
 			PrintString: "[Found] [OpenWeather API Key] ",
 		},
 		{
-			Regex: regexp.MustCompile("oy2[a-z0-9]{43}"),
+			Regex:       regexp.MustCompile("oy2[a-z0-9]{43}"),
 			PrintString: "[Found] [NuGet API Key] ",
 		},
 		{
