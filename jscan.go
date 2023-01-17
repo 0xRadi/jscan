@@ -256,7 +256,7 @@ func main() {
 			PrintString: "[Secret] [pgp_private_block] ",
 		},
 		{
-			Regex:       regexp.MustCompile("(?i)ey[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_=]+\\.?[A-Za-z0-9-_.+/=]*$"),
+			Regex:       regexp.MustCompile("eyJ((?:\\.?(?:[A-Za-z0-9-_]+)){3})"),
 			PrintString: "[Secret] [json_web_token] ",
 		},
 		{
@@ -270,6 +270,10 @@ func main() {
 		{
 			Regex:       regexp.MustCompile("(?i)(password\\s*[`=:\"]+\\s*[^\\s]+|passwordis\\s*[`=:\"]*\\s*[^\\s]+|pwd\\s*[`=:\"]*\\s*[^\\s]+|passwd\\s*[`=:\"]+\\s*[^\\s]+)"),
 			PrintString: "[Secret] [possible_Creds] ",
+		},
+		{
+			Regex:       regexp.MustCompile("(eyJ[a-zA-Z0-9]{10,}\\.eyJ[a-zA-Z0-9]{10,}\\.[a-zA-Z0-9_-]{10,})"),
+			PrintString: "[Found] [JWT] ",
 		},
 		{
 			Regex:       regexp.MustCompile(`(?:"|')(((?:[a-zA-Z]{1,10}://|//)[^"'/]{1,}\.[a-zA-Z]{2,}[^"']{0,})|((?:/|\.\./|\./)[^"'><,;| *()(%%$^/\\\\[\\]]][^"'><,;|()]{1,})|([a-zA-Z0-9_\-/]{1,}/[a-zA-Z0-9_\-/]{1,}\.(?:[a-zA-Z]{1,4}|action)(?:[\\?|#][^"|']{0,}|))|([a-zA-Z0-9_\-/]{1,}/[a-zA-Z0-9_\-/]{3,}(?:[\\?|#][^"|']{0,}|))|([a-zA-Z0-9_\-]{1,}\.(?:php|asp|aspx|jsp|json|action|html|js|txt|xml)(?:[\\?|#][^"|']{0,}|)))(?:"|')`),
