@@ -45,7 +45,7 @@ func checkMatches(link string, body string, matchers []Matcher) {
 	matches := []string{}                   // slice to store matches
 
 	// to exclude some rubbish findings
-	exclusionList := []string{"text", "w3", "video", "image", "application", "d/y", "m/y"}
+	exclusionList := []string{"text", "w3", "video", "image", "application", "multipart", "d/y", "m/y"}
 
 	for _, matcher := range matchers {
 		match := matcher.Regex.FindAllStringSubmatch(body, -1)
@@ -177,103 +177,168 @@ func main() {
 	matchers := []Matcher{
 		{
 			Regex:       regexp.MustCompile("(?i)AIza[0-9A-Za-z-_]{35}|(?i)6L[0-9A-Za-z-_]{38}|(?i)^6[0-9a-zA-Z_-]{39}$"),
-			PrintString: "[Secret] [google_api] ",
+			PrintString: "[Found] [google_api] ",
 		},
 		{
 			Regex:       regexp.MustCompile("(?i)A[SK]IA[0-9A-Z]{16}"),
-			PrintString: "[Secret] [amazon_aws_access_key_id] ",
+			PrintString: "[Potential] [amazon_aws_access_key_id] ",
 		},
 		{
 			Regex:       regexp.MustCompile("(?i)AAAA[A-Za-z0-9_-]{7}:[A-Za-z0-9_-]{140}"),
-			PrintString: "[Secret] [firebase] ",
+			PrintString: "[Found] [firebase] ",
 		},
 		{
 			Regex:       regexp.MustCompile("6L[0-9A-Za-z-_]{38}|^6[0-9a-zA-Z_-]{39}$"),
-			PrintString: "[Secret] [google_captcha] ",
+			PrintString: "[Potential] [google_captcha] ",
 		},
 		{
 			Regex:       regexp.MustCompile("(?i)ya29\\.[0-9A-Za-z\\-_]+"),
-			PrintString: "[Secret] [google_oauth] ",
+			PrintString: "[Found] [google_oauth] ",
 		},
 		{
 			Regex:       regexp.MustCompile("(?i)amzn\\\\.mws\\\\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"),
-			PrintString: "[Secret] [amazon_mws_auth_toke] ",
+			PrintString: "[Found] [amazon_mws_auth_toke] ",
 		},
 		{
 			Regex:       regexp.MustCompile("(?i)s3\\.amazonaws\\.com[/]+|[a-zA-Z0-9_-]*\\.s3\\.amazonaws\\.com"),
-			PrintString: "[Secret] [amazon_aws_url] ",
+			PrintString: "[Potential] [amazon_aws_url] ",
 		},
 		{
 			Regex:       regexp.MustCompile("(?i)EAACEdEose0cBA[0-9A-Za-z]+"),
-			PrintString: "[Secret] [facebook_access_token] ",
+			PrintString: "[Found] [facebook_access_token] ",
 		},
 		{
 			Regex:       regexp.MustCompile("(?i)bearer[a-zA-Z0-9_\\-\\.=:_+/]{5,100}"),
-			PrintString: "[Secret] [authorization_bearer] ",
+			PrintString: "[Potential] [authorization_bearer] ",
 		},
 		{
 			Regex:       regexp.MustCompile("(?i)key-[0-9a-zA-Z]{32}"),
-			PrintString: "[Secret] [mailgun_api_key] ",
+			PrintString: "[Found] [mailgun_api_key] ",
 		},
 		{
 			Regex:       regexp.MustCompile("(?i)access_token\\$production\\$[0-9a-z]{16}\\$[0-9a-f]{32}"),
-			PrintString: "[Secret] [paypal_braintree_access_token] ",
+			PrintString: "[Found] [paypal_braintree_access_token] ",
 		},
 		{
 			Regex:       regexp.MustCompile("(?i)sq0csp-[0-9A-Za-z\\-_]{43}|sq0[a-z]{3}-[0-9A-Za-z\\-_]{22,43}"),
-			PrintString: "[Secret] [square_oauth_secret] ",
+			PrintString: "[Found] [square_oauth_secret] ",
 		},
 		{
-			Regex:       regexp.MustCompile("(?i)sqOatp-[0-9A-Za-z\\-_]{22}|EAAA[a-zA-Z0-9]{60}"),
-			PrintString: "[Secret] [square_access_token] ",
+			Regex:       regexp.MustCompile("sqOatp-[0-9A-Za-z\\-_]{22}|EAAA[a-zA-Z0-9]{60}"),
+			PrintString: "[Potential] [square_access_token] ",
 		},
 		{
 			Regex:       regexp.MustCompile("(?i)sk_live_[0-9a-zA-Z]{24}"),
-			PrintString: "[Secret] [stripe_standard_api] ",
+			PrintString: "[Found] [stripe_standard_api] ",
 		},
 		{
 			Regex:       regexp.MustCompile("(?i)rk_live_[0-9a-zA-Z]{24}"),
-			PrintString: "[Secret] [stripe_restricted_api] ",
+			PrintString: "[Found] [stripe_restricted_api] ",
 		},
 		{
 			Regex:       regexp.MustCompile("(?i)[a-zA-Z0-9_-]*:[a-zA-Z0-9_\\-]+@github\\.com*"),
-			PrintString: "[Secret] [github_access_token] ",
+			PrintString: "[Found] [github_access_token] ",
 		},
 		{
 			Regex:       regexp.MustCompile("(?i)-----BEGINRSAPRIVATEKEY-----"),
-			PrintString: "[Secret] [rsa_private_key] ",
+			PrintString: "[Found] [rsa_private_key] ",
 		},
 		{
 			Regex:       regexp.MustCompile("(?i)-----BEGINDSAPRIVATEKEY-----"),
-			PrintString: "[Secret] [ssh_dsa_private_key] ",
+			PrintString: "[Found] [ssh_dsa_private_key] ",
 		},
 		{
 			Regex:       regexp.MustCompile("(?i)-----BEGINECPRIVATEKEY-----"),
-			PrintString: "[Secret] [ssh_dc_private_key] ",
+			PrintString: "[Found] [ssh_dc_private_key] ",
 		},
 		{
 			Regex:       regexp.MustCompile("(?i)-----BEGINPGPPRIVATEKEYBLOCK-----"),
-			PrintString: "[Secret] [pgp_private_block] ",
+			PrintString: "[Found] [pgp_private_block] ",
 		},
 		{
 			Regex:       regexp.MustCompile("eyJ((?:\\.?(?:[A-Za-z0-9-_]+)){3})"),
-			PrintString: "[Secret] [json_web_token] ",
+			PrintString: "[Found] [json_web_token] ",
 		},
 		{
-			Regex:       regexp.MustCompile("(?i)\"api_token\":\"(xox[a-zA-Z]-[a-zA-Z0-9-]+)\""),
-			PrintString: "[Secret] [slack_token] ",
+			Regex:       regexp.MustCompile("(xox[pboa]-[0-9]{12}-[0-9]{12}-[0-9]{12}-[a-z0-9]{32})"),
+			PrintString: "[Found] [slack_token] ",
+		},
+		{
+			Regex:       regexp.MustCompile("https://hooks.slack.com/services/T[a-zA-Z0-9_]{8}/B[a-zA-Z0-9_]{8}/[a-zA-Z0-9_]{24}"),
+			PrintString: "[Found] [slack webhook] ",
 		},
 		{
 			Regex:       regexp.MustCompile("(?i)([-]+BEGIN[^\\s]+PRIVATEKEY[-]+[\\s]*[^-]*[-]+END[^\\s]+PRIVATEKEY[-]+)"),
-			PrintString: "[Secret] [SSH_privKey] ",
+			PrintString: "[Found] [SSH_privKey] ",
 		},
-		{
-			Regex:       regexp.MustCompile("(?i)(password\\s*[`=:\"]+\\s*[^\\s]+|passwordis\\s*[`=:\"]*\\s*[^\\s]+|pwd\\s*[`=:\"]*\\s*[^\\s]+|passwd\\s*[`=:\"]+\\s*[^\\s]+)"),
-			PrintString: "[Secret] [possible_Creds] ",
-		},
+		//{
+		//	Regex:       regexp.MustCompile("(?i)(password\\s*[`=:\"]+\\s*[^\\s]+|passwordis\\s*[`=:\"]*\\s*[^\\s]+|pwd\\s*[`=:\"]*\\s*[^\\s]+|passwd\\s*[`=:\"]+\\s*[^\\s]+)"),
+		//	PrintString: "[Secret] [possible_Creds] ",
+		//},
 		{
 			Regex:       regexp.MustCompile("(eyJ[a-zA-Z0-9]{10,}\\.eyJ[a-zA-Z0-9]{10,}\\.[a-zA-Z0-9_-]{10,})"),
 			PrintString: "[Found] [JWT] ",
+		},
+		//https://github.com/deepfence/SecretScanner/blob/bbc861dca497b01870d31a35d77ec51fc82f21a2/config.yaml
+		{
+			Regex: regexp.MustCompile("(?i)appid=(\"|'|`)?[0-9a-f]{32}(\"|'|`)?"),
+			PrintString: "[Found] [OpenWeather API Key] ",
+		},
+		{
+			Regex: regexp.MustCompile("oy2[a-z0-9]{43}"),
+			PrintString: "[Found] [NuGet API Key] ",
+		},
+		{
+			Regex:       regexp.MustCompile("(?i)hockey.{0,50}(\"|'|`)?[0-9a-f]{32}(\"|'|`)?"),
+			PrintString: "[Found] [HockeyApp] ",
+		},
+		{
+			Regex:       regexp.MustCompile("(?i)sonar.{0,50}(\"|'|`)?[0-9a-f]{40}(\"|'|`)?"),
+			PrintString: "[Found] [SonarQube Docs API Key] ",
+		},
+		{
+			Regex:       regexp.MustCompile("(?i)hockey.{0,50}(\"|'|`)?[0-9a-f]{32}(\"|'|`)"),
+			PrintString: "[Found] [HockeyApp] ",
+		},
+		{
+			Regex:       regexp.MustCompile("(?i)heroku(.{0,20})?[''\"][0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}[''\"]"),
+			PrintString: "[Found] [Heroku API key] ",
+		},
+		{
+			Regex:       regexp.MustCompile("(?i)linkedin(.{0,20})?(?-i)[''\\\"][0-9a-z]{12}[''\\\"]"),
+			PrintString: "[Found] [Linkedin Client ID] ",
+		},
+		{
+			Regex:       regexp.MustCompile("(?i)linkedin(.{0,20})?[''\"][0-9a-z]{16}[''\"]"),
+			PrintString: "[Found] [LinkedIn Secret Key] ",
+		},
+		{
+			Regex:       regexp.MustCompile("hawk\\.[0-9A-Za-z\\-_]{20}\\.[0-9A-Za-z\\-_]{20}"),
+			PrintString: "[Found] [StackHawk API Key] ",
+		},
+		{
+			Regex:       regexp.MustCompile("SG\\.[0-9A-Za-z\\-_]{22}\\.[0-9A-Za-z\\-_]{43}"),
+			PrintString: "[Found] [SendGrid API Key] ",
+		},
+		{
+			Regex:       regexp.MustCompile("(?i)twitter(.{0,20})?[''\"][0-9a-z]{35,44}[''\"]"),
+			PrintString: "[Found] [Twitter Secret Key] ",
+		},
+		{
+			Regex:       regexp.MustCompile("sk_[live|test]_[0-9a-z]{32}"),
+			PrintString: "[Found] [Picatic API key] ",
+		},
+		{
+			Regex:       regexp.MustCompile("pypi-AgEIcHlwaS5vcmc[A-Za-z0-9-_]{50,1000}"),
+			PrintString: "[Found] [PyPI upload token] ",
+		},
+		{
+			Regex:       regexp.MustCompile("^[0-9a-fA-F]{32}$"),
+			PrintString: "[Potential] [Algolia Admin Key] ",
+		},
+		{
+			Regex:       regexp.MustCompile("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$"),
+			PrintString: "[Found] [EMAIL] ",
 		},
 		{
 			Regex:       regexp.MustCompile(`(?:"|')(((?:[a-zA-Z]{1,10}://|//)[^"'/]{1,}\.[a-zA-Z]{2,}[^"']{0,})|((?:/|\.\./|\./)[^"'><,;| *()(%%$^/\\\\[\\]]][^"'><,;|()]{1,})|([a-zA-Z0-9_\-/]{1,}/[a-zA-Z0-9_\-/]{1,}\.(?:[a-zA-Z]{1,4}|action)(?:[\\?|#][^"|']{0,}|))|([a-zA-Z0-9_\-/]{1,}/[a-zA-Z0-9_\-/]{3,}(?:[\\?|#][^"|']{0,}|))|([a-zA-Z0-9_\-]{1,}\.(?:php|asp|aspx|jsp|json|action|html|js|txt|xml)(?:[\\?|#][^"|']{0,}|)))(?:"|')`),
