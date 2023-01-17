@@ -35,7 +35,7 @@ var jsonOutput = flag.Bool("json", false, "JSON output format")
 var verbose = flag.Bool("v", false, "Verbose mode")
 var quite = flag.Bool("q", false, "start in silent mode with no stdout")
 var threadCount = flag.Int("t", 20, "Number of threads")
-var outputFile = flag.String("o", "ja_analysis.txt", "File to save output")
+var outputFile = flag.String("o", "", "File to save output")
 
 // checkMatches function takes in a URL, a string of the body of the URL, and a slice of Matcher structs
 // it uses the regular expressions in the Matcher structs to find matches in the body of the URL
