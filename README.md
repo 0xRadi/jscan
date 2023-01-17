@@ -1,4 +1,4 @@
-# Overview
+# jScan
 This tool is used to scan a list of URLs for sensitive information such as API keys, access tokens, and private keys. It uses regular expressions to search for specific patterns in the HTML of the URLs and can output the results in either plain text or JSON format.
 
 # Install
