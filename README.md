@@ -8,11 +8,11 @@ go install github.com/0xRadi/jscan@latest
 
 ## Usage
 To use this tool, provide a list of URLs to be scanned through stdin (e.g. by redirecting a file) and run the program with the desired flags.
-- To increase the threads `-t 100`
-- To output the results in JSON format, use the flag `-json`.
-- To save results to specific file `-o results.json`
-- For quite mode (no printing only save results to file) use `-q`
-- To enable verbose mode, use the flag `-v`.
+- `-t 100` to increase the threads.
+- `-json` to output the results in JSON format, use the flag.
+- `-o results.json` to save results to specific file.
+- `-q` for quite mode (no printing only save results to file)
+- `-v` to enable verbose mode for debugging
 
 For example:
 `cat urls.txt | jscan -json -v`
