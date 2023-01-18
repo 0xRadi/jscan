@@ -17,15 +17,12 @@ To use this tool, provide a list of URLs to be scanned through stdin (e.g. by re
 - `-v` to enable verbose mode for debugging
 
 For example:
-`cat javascript_urls.txt | jscan -json -o output.json`
 
+`cat javascript_urls.txt | jscan -json -o output.json`
 
 `echo http://google.com/file.js | jscan`
 
 
-
-
-The program will then scan each URL in the provided list and output any sensitive information that is found in either plain text or JSON format, depending on the flags used.
 
 ## Customizing Matchers
 The regular expressions used to search for sensitive information in the HTML can be customized by modifying the `matchers` variable in the main function. Each matcher is a struct containing two fields: `Regex` and `PrintString`. `Regex` is a regular expression used to search for a specific pattern and `PrintString` is the string that will be printed before the match when outputting results in plain text format.
