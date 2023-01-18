@@ -1,5 +1,7 @@
 # jScan
-This tool is used to scan a list of URLs for sensitive information such as API keys, access tokens, and private keys. It uses regular expressions to search for specific patterns in the HTML of the URLs and can output the results in either plain text or JSON format.
+This tool is used to scan a list of URLs for sensitive information such as API keys, access tokens, and private keys. It uses regular expressions to search for specific patterns in the body conent of the URLs provided and can output the results in either plain text or JSON format.
+
+**jScan was made mainly to scan JS files for Secrets, and endpoints.**
 
 # Install
 ```
@@ -15,7 +17,8 @@ To use this tool, provide a list of URLs to be scanned through stdin (e.g. by re
 - `-v` to enable verbose mode for debugging
 
 For example:
-`cat urls.txt | jscan -json -v`
+`cat javascript_urls.txt | jscan -json -o output.json`
+`echo http://google.com/file.js | jscan`
 
 
 
