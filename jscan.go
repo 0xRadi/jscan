@@ -329,10 +329,6 @@ func main() {
 			Regex:       regexp.MustCompile("[\"'][0-9a-fA-F]{32}[\"']"),
 			PrintString: "[Potential] [Algolia Admin Key] ",
 		},
-		{
-			Regex:       regexp.MustCompile("[\"'][0-9a-zA-Z]{32}[\"']"),
-			PrintString: "[Potential] [API Key] ",
-		},
 		// https://github.com/PortSwigger/js-miner/blob/main/src/main/java/burp/utils/Constants.java
 		{
 			Regex:       regexp.MustCompile("secret[_-]?(key|token|secret)|api[_-]?(key|token|secret)|access[_-]?(key|token|secret)|auth[_-]?(key|token|secret)|session[_-]?(key|token|secret)|consumer[_-]?(key|token|secret)|client[_-]?(id|token|key)|ssh[_-]?key|encrypt[_-]?(secret|key)|decrypt[_-]?(secret|key)"),
