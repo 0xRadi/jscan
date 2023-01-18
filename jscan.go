@@ -271,10 +271,7 @@ func main() {
 		//	Regex:       regexp.MustCompile("(?i)(password\\s*[`=:\"]+\\s*[^\\s]+|passwordis\\s*[`=:\"]*\\s*[^\\s]+|pwd\\s*[`=:\"]*\\s*[^\\s]+|passwd\\s*[`=:\"]+\\s*[^\\s]+)"),
 		//	PrintString: "[Secret] [possible_Creds] ",
 		//},
-		{
-			Regex:       regexp.MustCompile("(eyJ[a-zA-Z0-9]{10,}\\.eyJ[a-zA-Z0-9]{10,}\\.[a-zA-Z0-9_-]{10,})"),
-			PrintString: "[Found] [JWT] ",
-		},
+
 		//https://github.com/deepfence/SecretScanner/blob/bbc861dca497b01870d31a35d77ec51fc82f21a2/config.yaml
 		{
 			Regex:       regexp.MustCompile("(?i)appid=(\"|'|`)?[0-9a-f]{32}(\"|'|`)?"),
@@ -325,19 +322,28 @@ func main() {
 			PrintString: "[Found] [Picatic API key] ",
 		},
 		{
-			Regex:       regexp.MustCompile("pypi-AgEIcHlwaS5vcmc[A-Za-z0-9-_]{50,1000}"),
-			PrintString: "[Found] [PyPI upload token] ",
+			Regex:       regexp.MustCompile("(?i)resumatorapi\\.com+"),
+			PrintString: "[Found] [JazzHR] ",
 		},
 		{
-			Regex:       regexp.MustCompile("^[0-9a-fA-F]{32}$"),
+			Regex:       regexp.MustCompile("[\"'][0-9a-fA-F]{32}[\"']"),
 			PrintString: "[Potential] [Algolia Admin Key] ",
 		},
 		{
-			Regex:       regexp.MustCompile("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$"),
+			Regex:       regexp.MustCompile("[\"'][0-9a-zA-Z]{32}[\"']"),
+			PrintString: "[Potential] [API Key] ",
+		},
+		// https://github.com/PortSwigger/js-miner/blob/main/src/main/java/burp/utils/Constants.java
+		{
+			Regex:       regexp.MustCompile("secret[_-]?(key|token|secret)|api[_-]?(key|token|secret)|access[_-]?(key|token|secret)|auth[_-]?(key|token|secret)|session[_-]?(key|token|secret)|consumer[_-]?(key|token|secret)|client[_-]?(id|token|key)|ssh[_-]?key|encrypt[_-]?(secret|key)|decrypt[_-]?(secret|key)"),
+			PrintString: "[Potential] [Secret] ",
+		},
+		{
+			Regex:       regexp.MustCompile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+"),
 			PrintString: "[Found] [EMAIL] ",
 		},
 		{
-			Regex:       regexp.MustCompile(`(?:"|')(((?:[a-zA-Z]{1,10}://|//)[^"'/]{1,}\.[a-zA-Z]{2,}[^"']{0,})|((?:/|\.\./|\./)[^"'><,;| *()(%%$^/\\\\[\\]]][^"'><,;|()]{1,})|([a-zA-Z0-9_\-/]{1,}/[a-zA-Z0-9_\-/]{1,}\.(?:[a-zA-Z]{1,4}|action)(?:[\\?|#][^"|']{0,}|))|([a-zA-Z0-9_\-/]{1,}/[a-zA-Z0-9_\-/]{3,}(?:[\\?|#][^"|']{0,}|))|([a-zA-Z0-9_\-]{1,}\.(?:php|asp|aspx|jsp|json|action|html|js|txt|xml)(?:[\\?|#][^"|']{0,}|)))(?:"|')`),
+			Regex:       regexp.MustCompile(`(?:"|')(((?:[a-zA-Z]{1,10}://|//)[^"'/]{1,}\.[a-zA-Z]{2,}[^"']{0,})|((?:/|\.\./|\./)[^"'><,;| *()(%%$^/\\[\\]]][^"'><,;|()]{1,})|([a-zA-Z0-9_\-/]{1,}/[a-zA-Z0-9_\-/]{1,}\.(?:[a-zA-Z]{1,4}|action)(?:[\\?|#][^"|']{0,}|))|([a-zA-Z0-9_\-/]{1,}/[a-zA-Z0-9_\-/]{3,}(?:[\\?|#][^"|']{0,}|))|([a-zA-Z0-9_\-]{1,}\.(?:php|asp|aspx|jsp|json|action|html|js|txt|xml)(?:[\\?|#][^"|']{0,}|)))(?:"|')`),
 			PrintString: "[Endpoint] ",
 		},
 	}
