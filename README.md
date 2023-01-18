@@ -18,6 +18,8 @@ To use this tool, provide a list of URLs to be scanned through stdin (e.g. by re
 
 For example:
 `cat javascript_urls.txt | jscan -json -o output.json`
+
+
 `echo http://google.com/file.js | jscan`
 
 
