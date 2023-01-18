@@ -175,10 +175,10 @@ func main() {
 
 	// Matchers for Secrets or endpoints
 	matchers := []Matcher{
-		//{
-		//	Regex:       regexp.MustCompile("(?i)AIza[0-9A-Za-z-_]{35}|(?i)6L[0-9A-Za-z-_]{38}|(?i)^6[0-9a-zA-Z_-]{39}$"),
-		//	PrintString: "[Found] [google_api] ",
-		//},
+		{
+			Regex:       regexp.MustCompile("(?i)[\"'(]AIza[0-9A-Za-z-_]{35}|(?i)[\"'(]6L[0-9A-Za-z-_]{38}|(?i)[\"'(]6[0-9a-zA-Z_-]{39}[\"')]"),
+			PrintString: "[Found] [google_api] ",
+		},
 		{
 			Regex:       regexp.MustCompile("(?i)A[SK]IA[0-9A-Z]{16}"),
 			PrintString: "[Potential] [amazon_aws_access_key_id] ",
@@ -188,7 +188,7 @@ func main() {
 			PrintString: "[Found] [firebase] ",
 		},
 		{
-			Regex:       regexp.MustCompile("6L[0-9A-Za-z-_]{38}|^6[0-9a-zA-Z_-]{39}$"),
+			Regex:       regexp.MustCompile("[\"'(]6L[0-9A-Za-z-_]{38}|^6[0-9a-zA-Z_-]{39}[\"')]"),
 			PrintString: "[Potential] [google_captcha] ",
 		},
 		{
@@ -220,7 +220,7 @@ func main() {
 			PrintString: "[Found] [paypal_braintree_access_token] ",
 		},
 		{
-			Regex:       regexp.MustCompile("(?i)sq0csp-[0-9A-Za-z\\-_]{43}|sq0[a-z]{3}-[0-9A-Za-z\\-_]{22,43}"),
+			Regex:       regexp.MustCompile("(?i)[\"'(]sq0csp-[0-9A-Za-z\\-_]{43}|sq0[a-z]{3}-[0-9A-Za-z\\-_]{22,43}[\"')]"),
 			PrintString: "[Found] [square_oauth_secret] ",
 		},
 		{
@@ -272,6 +272,7 @@ func main() {
 		//	PrintString: "[Secret] [possible_Creds] ",
 		//},
 
+		// SecretScanner Regex
 		//https://github.com/deepfence/SecretScanner/blob/bbc861dca497b01870d31a35d77ec51fc82f21a2/config.yaml
 		{
 			Regex:       regexp.MustCompile("(?i)appid=(\"|'|`)?[0-9a-f]{32}(\"|'|`)?"),
@@ -326,16 +327,19 @@ func main() {
 			PrintString: "[Found] [JazzHR] ",
 		},
 		{
-			Regex:       regexp.MustCompile("[\"'][0-9a-fA-F]{32}[\"']"),
-			PrintString: "[Potential] [Algolia Admin Key] ",
+			Regex:       regexp.MustCompile("[\"'(][0-9a-fA-F]{32}[\"')]"),
+			PrintString: "[Potential] [API Key] ",
 		},
+
+		// js-miner Regex
 		// https://github.com/PortSwigger/js-miner/blob/main/src/main/java/burp/utils/Constants.java
 		{
 			Regex:       regexp.MustCompile("secret[_-]?(key|token|secret)|api[_-]?(key|token|secret)|access[_-]?(key|token|secret)|auth[_-]?(key|token|secret)|session[_-]?(key|token|secret)|consumer[_-]?(key|token|secret)|client[_-]?(id|token|key)|ssh[_-]?key|encrypt[_-]?(secret|key)|decrypt[_-]?(secret|key)"),
 			PrintString: "[Potential] [Secret] ",
 		},
 		{
-			Regex:       regexp.MustCompile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+"),
+			// Improved to ignore versions eg. tool@2.7.2
+			Regex:       regexp.MustCompile("[a-zA-Z0-9_.+-]+@[a-zA-Z]{1}[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+"),
 			PrintString: "[Found] [EMAIL] ",
 		},
 		{
